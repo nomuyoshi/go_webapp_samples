@@ -4,6 +4,8 @@ import (
 	"log"
 	"net/http"
 
+	"webapp_samples/trace"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -13,6 +15,7 @@ type room struct {
 	join    chan *client     // ルームに入室しようとしているクライアント管理のチャネル
 	leave   chan *client     // ルームから退室しようとしているクライアント管理のチャネル
 	clients map[*client]bool // ルームに入室中のクライアント管理
+	tracer  trace.Tracer     // tracer はロガー
 }
 
 func newRoom() *room {
@@ -30,15 +33,15 @@ func (r *room) run() {
 		case client := <-r.join:
 			// 入室
 			r.clients[client] = true
-			log.Println("入室")
+			r.tracer.Trace("新規クライアントが入室")
 		case client := <-r.leave:
 			// 退室
 			delete(r.clients, client)
 			// 退室したらsendチャネルは不要（メッセージを受け取らない）なので閉じる
 			close(client.send)
-			log.Println("退室")
+			r.tracer.Trace("クライアントが退室")
 		case msg := <-r.forward:
-			log.Println("メッセージ送信")
+			r.tracer.Trace("メッセージ受信 mgs: ", msg)
 			// forward チャネルにメッセージが送信されてきたら
 			// 入室中のクライアントのsendチャネルにメッセージを送信
 			// sendチャネルに送信したら、クライアントのwriteメソッドがwebsocketに書きこむ
@@ -46,10 +49,11 @@ func (r *room) run() {
 				select {
 				case c.send <- msg:
 					// メッセージ送信
+					r.tracer.Trace("メッセージ送信成功")
 				default:
-					log.Println("送信失敗")
 					delete(r.clients, c)
 					close(c.send)
+					r.tracer.Trace("メッセージ送信失敗")
 				}
 			}
 		}

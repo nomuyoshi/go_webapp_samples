@@ -41,7 +41,7 @@ func (r *room) run() {
 			close(client.send)
 			r.tracer.Trace("クライアントが退室")
 		case msg := <-r.forward:
-			r.tracer.Trace("メッセージ受信 mgs: ", msg)
+			r.tracer.Trace("メッセージ受信 mgs: ", string(msg))
 			// forward チャネルにメッセージが送信されてきたら
 			// 入室中のクライアントのsendチャネルにメッセージを送信
 			// sendチャネルに送信したら、クライアントのwriteメソッドがwebsocketに書きこむ

@@ -30,12 +30,15 @@ func (r *room) run() {
 		case client := <-r.join:
 			// 入室
 			r.clients[client] = true
+			log.Println("入室")
 		case client := <-r.leave:
 			// 退室
 			delete(r.clients, client)
 			// 退室したらsendチャネルは不要（メッセージを受け取らない）なので閉じる
 			close(client.send)
+			log.Println("退室")
 		case msg := <-r.forward:
+			log.Println("メッセージ送信")
 			// forward チャネルにメッセージが送信されてきたら
 			// 入室中のクライアントのsendチャネルにメッセージを送信
 			// sendチャネルに送信したら、クライアントのwriteメソッドがwebsocketに書きこむ
@@ -44,6 +47,7 @@ func (r *room) run() {
 				case c.send <- msg:
 					// メッセージ送信
 				default:
+					log.Println("送信失敗")
 					delete(r.clients, c)
 					close(c.send)
 				}

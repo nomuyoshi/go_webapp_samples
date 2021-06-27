@@ -14,7 +14,7 @@ type client struct {
 // read はwebsocketからメッセージを読み込む
 func (c *client) read() {
 	for {
-		if _, msg, err := c.socket.ReadMessage(); err != nil {
+		if _, msg, err := c.socket.ReadMessage(); err == nil {
 			// websocketから読み込んだメッセージをroomのforwardチャネルに送信
 			c.room.forward <- msg
 		} else {

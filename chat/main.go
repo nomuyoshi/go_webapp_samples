@@ -10,6 +10,10 @@ import (
 	"sync"
 
 	"webapp_samples/trace"
+
+	"github.com/stretchr/gomniauth"
+	"github.com/stretchr/gomniauth/providers/google"
+	"github.com/stretchr/signature"
 )
 
 type templateHandler struct {
@@ -36,6 +40,10 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func main() {
 	var addr = flag.String("addr", ":8080", "アプリケーションのアドレス")
 	flag.Parse()
+	gomniauth.SetSecurityKey(signature.RandomKey(64))
+	gomniauth.WithProviders(
+		google.New(os.Getenv("GOOGLE_CLIENT_ID"), os.Getenv("GOOGLE_SECRET_KEY"), "http://localhost:8080/auth/callback/google"),
+	)
 	r := newRoom()
 	r.tracer = trace.New(os.Stdout)
 	http.Handle("/login", &templateHandler{filename: "login.html"})

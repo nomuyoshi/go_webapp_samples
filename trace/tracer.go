@@ -7,19 +7,18 @@ import (
 )
 
 // Tracer はログ出力できるオブジェクトを表すインターフェース
-type Tracer interface {
-	Trace(...interface{})
-}
-
-type tracer struct {
+type Tracer struct {
 	out io.Writer
 }
 
-func (t *tracer) Trace(args ...interface{}) {
-	fmt.Fprint(t.out, args...)
-	fmt.Fprint(t.out, "\n")
+func (t Tracer) Trace(args ...interface{}) {
+	// ゼロ値の場合何もしない
+	if t.out == nil {
+		return
+	}
+	fmt.Fprintln(t.out, args...)
 }
 
 func New(w io.Writer) Tracer {
-	return &tracer{out: w}
+	return Tracer{out: w}
 }

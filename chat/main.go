@@ -60,6 +60,7 @@ func main() {
 	// ログイン後
 	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
 	http.Handle("/room", r)
+	http.HandleFunc("/logout", logoutHandler)
 	go r.run()
 
 	log.Println("Webサーバー起動 port: ", *addr)

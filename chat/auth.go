@@ -15,7 +15,7 @@ type authHandler struct {
 
 // ServeHTTP はHandlerを実装
 func (h *authHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if _, err := r.Cookie("auth"); err == http.ErrNoCookie {
+	if cookie, err := r.Cookie("auth"); err == http.ErrNoCookie || cookie.Value == "" {
 		// 未認証
 		w.Header().Set("Location", "/login")
 		w.WriteHeader(http.StatusTemporaryRedirect)
@@ -73,7 +73,10 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatalln("ユーザー取得に失敗: ", provider, "-", err)
 		}
-		authCookieValue := objx.New(map[string]interface{}{"name": user.Name()}).MustBase64()
+		authCookieValue := objx.New(map[string]interface{}{
+			"name":       user.Name(),
+			"avatar_url": user.AvatarURL(),
+		}).MustBase64()
 		http.SetCookie(w, &http.Cookie{
 			Name:  "auth",
 			Value: authCookieValue,
@@ -86,4 +89,16 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		log.Println("未対応のアクション: ", action)
 	}
+}
+
+// logoutHandler はログアウト処理
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, &http.Cookie{
+		Name:   "auth",
+		Value:  "",
+		Path:   "/",
+		MaxAge: -1,
+	})
+	w.Header().Set("Location", "/login")
+	w.WriteHeader(http.StatusTemporaryRedirect)
 }

@@ -1,10 +1,30 @@
 <html>
   <head>
     <title>チャット</title>
+    <link rel="stylesheet"
+       href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
     <style>
-      input { display: block; }
-      ul { list-style-type: none; }
+      ul#messages { list-style: none; }
+      ul#messages li { margin-bottom: 2px; }
+      ul#messages li img { margin-right: 10px; }
     </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <ul id="messages"></ul>
+        </div>
+      </div>
+      <form id="chatbox" role="form">
+        <div class="form-group">
+          <label for="message">{{.UserData.name}}からメッセージを送信</label>
+          または<a href="/logout">サインアウト</a>
+          <textarea id="message" class="form-control"></textarea>
+        </div>
+        <input type="submit" value="送信" class="btn btn-default" />
+      </form>
+    </div>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js">
     </script>
     <script>
@@ -47,14 +67,5 @@
         }
       });
     </script>
-  </head>
-  <body>
-    <ul id="messages"></ul>
-    <p>チャットしよう!!または、<a href="/logout">ログアウト</a></p>
-    <p>{{.UserData.name}}</p>
-    <form id="chatbox">
-      <textarea cols="30" rows="10"></textarea>
-      <input type="submit" value="送信" />
-    </form>
   </body>
 </html>

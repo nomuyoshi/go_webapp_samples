@@ -7,11 +7,12 @@ import (
 	"webapp_samples/trace"
 
 	"github.com/gorilla/websocket"
+	"github.com/stretchr/objx"
 )
 
 // room はクライアントとの接続管理、メッセージ受付を行う
 type room struct {
-	forward chan []byte      // ルーム内にいるクライアントに転送するメッセージを保持するチャネル
+	forward chan *message    // ルーム内にいるクライアントに転送するメッセージを保持するチャネル
 	join    chan *client     // ルームに入室しようとしているクライアント管理のチャネル
 	leave   chan *client     // ルームから退室しようとしているクライアント管理のチャネル
 	clients map[*client]bool // ルームに入室中のクライアント管理
@@ -20,7 +21,7 @@ type room struct {
 
 func newRoom() *room {
 	return &room{
-		forward: make(chan []byte),
+		forward: make(chan *message),
 		join:    make(chan *client),
 		leave:   make(chan *client),
 		clients: make(map[*client]bool),
@@ -41,7 +42,7 @@ func (r *room) run() {
 			close(client.send)
 			r.tracer.Trace("クライアントが退室")
 		case msg := <-r.forward:
-			r.tracer.Trace("メッセージ受信 mgs: ", string(msg))
+			r.tracer.Trace("メッセージ受信 mgs: ", string(msg.Message))
 			// forward チャネルにメッセージが送信されてきたら
 			// 入室中のクライアントのsendチャネルにメッセージを送信
 			// sendチャネルに送信したら、クライアントのwriteメソッドがwebsocketに書きこむ
@@ -76,11 +77,18 @@ func (r *room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("ServeHTTP: ", err)
 		return
 	}
-	client := &client{
-		socket: socket,
-		send:   make(chan []byte, messageBufferSize),
-		room:   r,
+	authCookie, err := req.Cookie("auth")
+	if err != nil {
+		log.Fatal("クッキー取得失敗: ", err)
 	}
+
+	client := &client{
+		socket:   socket,
+		send:     make(chan *message, messageBufferSize),
+		room:     r,
+		userData: objx.MustFromBase64(authCookie.Value),
+	}
+
 	r.join <- client
 	defer func() { r.leave <- client }()
 

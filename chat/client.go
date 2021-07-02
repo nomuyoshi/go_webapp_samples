@@ -19,7 +19,7 @@ func (c *client) read() {
 	for {
 		var msg message
 		if err := c.socket.ReadJSON(&msg); err == nil {
-			msg.When = time.Now()
+			msg.When = time.Now().Format("2006/01/02 15:04:05")
 			msg.Name = c.userData["name"].(string)
 			// websocketから読み込んだメッセージをroomのforwardチャネルに送信
 			c.room.forward <- &msg

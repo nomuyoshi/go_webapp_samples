@@ -53,7 +53,8 @@ func main() {
 		google.New(os.Getenv("GOOGLE_CLIENT_ID"), os.Getenv("GOOGLE_SECRET_KEY"), "http://localhost:8080/auth/callback/google"),
 	)
 	// r := newRoom(UseAuthAvatar)
-	r := newRoom(UseGravatarAvatar)
+	// r := newRoom(UseGravatarAvatar)
+	r := newRoom(UseFileSystemAvatar)
 	r.tracer = trace.New(os.Stdout)
 	http.Handle("/login", &templateHandler{filename: "login.html"})
 	http.HandleFunc("/auth/", loginHandler)

@@ -60,6 +60,11 @@ func main() {
 
 	// ログイン後
 	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
+	http.Handle("/upload", MustAuth(&templateHandler{filename: "upload.html"}))
+	http.Handle("/uploader", MustAuth(uploadHandler{}))
+	http.Handle("/avatars/", MustAuth(
+		http.StripPrefix("/avatars/",
+			http.FileServer(http.Dir("./avatars")))))
 	http.Handle("/room", r)
 	http.HandleFunc("/logout", logoutHandler)
 	go r.run()

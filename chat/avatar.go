@@ -18,7 +18,7 @@ type AuthAvatar struct{}
 var UseAuthAvatar AuthAvatar
 
 func (AuthAvatar) GetAvatarURL(c *client) (string, error) {
-	if url, ok := c.userData["avatar_url"]; ok {
+	if url, ok := c.userData["avatarURL"]; ok {
 		if urlStr, ok := url.(string); ok {
 			return urlStr, nil
 		}
@@ -32,7 +32,7 @@ type GravatarAvatar struct{}
 var UseGravatarAvatar GravatarAvatar
 
 func (GravatarAvatar) GetAvatarURL(c *client) (string, error) {
-	if userID, ok := c.userData["user_id"]; ok {
+	if userID, ok := c.userData["userID"]; ok {
 		if userIDStr, ok := userID.(string); ok {
 			return fmt.Sprintf("//www.gravatar.com/avatar/%s", userIDStr), nil
 		}

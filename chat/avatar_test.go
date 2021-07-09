@@ -11,7 +11,7 @@ func TestAuthAvatar(t *testing.T) {
 	}
 
 	testURL := "http://url-to-avatar/"
-	client.userData = map[string]interface{}{"avatar_url": testURL}
+	client.userData = map[string]interface{}{"avatarURL": testURL}
 	url, err := authAvatar.GetAvatarURL(client)
 	if err != nil && err != ErrNoAvatarURL {
 		t.Error("値が存在する場合、AuthAvatar.GetAvatarURLはエラーを返すべきではありません。unexpected error: ", err)
@@ -25,7 +25,7 @@ func TestAuthAvatar(t *testing.T) {
 func TestGravatarAvatar(t *testing.T) {
 	var gravatarAvatar GravatarAvatar
 	client := new(client)
-	client.userData = map[string]interface{}{"user_id": "0bc83cb571cd1c50ba6f3e8a78ef1346"}
+	client.userData = map[string]interface{}{"userID": "0bc83cb571cd1c50ba6f3e8a78ef1346"}
 	url, err := gravatarAvatar.GetAvatarURL(client)
 	if err != nil {
 		t.Error("GravatarAvatar.GetAvatarURLはエラーを返すべきではありません。error: ", err)

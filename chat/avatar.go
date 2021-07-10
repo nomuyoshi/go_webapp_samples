@@ -29,7 +29,19 @@ func (u chatUser) UniqueID() string {
 
 type Avatar interface {
 	// GetAvatarURL はクライアントのアバターURLを取得
-	GetAvatarURL(u *chatUser) (string, error)
+	GetAvatarURL(u ChatUser) (string, error)
+}
+
+type TryAvatars []Avatar
+
+func (a TryAvatars) GetAvatarURL(u ChatUser) (string, error) {
+	for _, avatar := range a {
+		if url, err := avatar.GetAvatarURL(u); err == nil {
+			return url, nil
+		}
+	}
+
+	return "", ErrNoAvatarURL
 }
 
 type AuthAvatar struct{}

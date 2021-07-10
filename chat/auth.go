@@ -80,9 +80,9 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(m, user.Email())
 		userID := fmt.Sprintf("%x", m.Sum(nil))
 		chatUser := &chatUser{User: user, uniqueID: userID}
-		avatarURL, err := avatars.GetAvatarURL(chatUser)
+		avatarURL, err := tryAvatars.GetAvatarURL(chatUser)
 		if err != nil {
-			log.Println("アバター取得に失敗. err: ", err)
+			log.Fatalln("アバター取得に失敗. err: ", err)
 		}
 		authCookieValue := objx.New(map[string]interface{}{
 			"userID":    userID,

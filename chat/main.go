@@ -17,10 +17,11 @@ import (
 	"github.com/stretchr/signature"
 )
 
-var avatars Avatar = UseFileSystemAvatar
-
-// var avatars Avatar := UseAuthAvatar
-// var avatars Avatar := UseGravatarAvatar
+var tryAvatars TryAvatars = []Avatar{
+	UseFileSystemAvatar,
+	UseGravatarAvatar,
+	UseAuthAvatar,
+}
 
 type templateHandler struct {
 	once     sync.Once

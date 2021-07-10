@@ -4,25 +4,42 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+
+	gomniauthcommon "github.com/stretchr/gomniauth/common"
 )
 
 // ErrNoAvatarURL はインスタンスがアバターURLを返すことが出来ないときに発生するエラー
 var ErrNoAvatarURL = errors.New("chat: アバターURLを取得できません")
 
+// ChatUser はチャットユーザーのインターフェイス
+type ChatUser interface {
+	UniqueID() string
+	AvatarURL() string
+}
+
+type chatUser struct {
+	gomniauthcommon.User
+	uniqueID string
+}
+
+// UniqueID はチャットユーザーのユニークIDを返す
+func (u chatUser) UniqueID() string {
+	return u.uniqueID
+}
+
 type Avatar interface {
 	// GetAvatarURL はクライアントのアバターURLを取得
-	GetAvatarURL(c *client) (string, error)
+	GetAvatarURL(u *chatUser) (string, error)
 }
 
 type AuthAvatar struct{}
 
 var UseAuthAvatar AuthAvatar
 
-func (AuthAvatar) GetAvatarURL(c *client) (string, error) {
-	if url, ok := c.userData["avatarURL"]; ok {
-		if urlStr, ok := url.(string); ok {
-			return urlStr, nil
-		}
+func (AuthAvatar) GetAvatarURL(u ChatUser) (string, error) {
+	url := u.AvatarURL()
+	if url != "" {
+		return url, nil
 	}
 
 	return "", ErrNoAvatarURL
@@ -32,35 +49,27 @@ type GravatarAvatar struct{}
 
 var UseGravatarAvatar GravatarAvatar
 
-func (GravatarAvatar) GetAvatarURL(c *client) (string, error) {
-	if userID, ok := c.userData["userID"]; ok {
-		if userIDStr, ok := userID.(string); ok {
-			return fmt.Sprintf("//www.gravatar.com/avatar/%s", userIDStr), nil
-		}
+func (GravatarAvatar) GetAvatarURL(u ChatUser) (string, error) {
+	if u.UniqueID() == "" {
+		return "", ErrNoAvatarURL
 	}
 
-	return "", ErrNoAvatarURL
+	return fmt.Sprintf("//www.gravatar.com/avatar/%s", u.UniqueID()), nil
 }
 
 type FileSystemAvatar struct{}
 
 var UseFileSystemAvatar FileSystemAvatar
 
-func (FileSystemAvatar) GetAvatarURL(c *client) (string, error) {
-	userID, ok := c.userData["userID"]
-	if !ok {
-		return "", ErrNoAvatarURL
-	}
-	userIDStr, ok := userID.(string)
-	if !ok {
+func (FileSystemAvatar) GetAvatarURL(u ChatUser) (string, error) {
+	if u.UniqueID() == "" {
 		return "", ErrNoAvatarURL
 	}
 
-	matches, err := filepath.Glob(filepath.Join("avatars", userIDStr+"*"))
+	matches, err := filepath.Glob(filepath.Join("avatars", u.UniqueID()+"*"))
 	if err != nil || len(matches) == 0 {
 		return "", ErrNoAvatarURL
 	}
 
-	fmt.Println(matches)
 	return matches[0], nil
 }

@@ -17,6 +17,11 @@ import (
 	"github.com/stretchr/signature"
 )
 
+var avatars Avatar = UseFileSystemAvatar
+
+// var avatars Avatar := UseAuthAvatar
+// var avatars Avatar := UseGravatarAvatar
+
 type templateHandler struct {
 	once     sync.Once
 	filename string
@@ -52,9 +57,7 @@ func main() {
 	gomniauth.WithProviders(
 		google.New(os.Getenv("GOOGLE_CLIENT_ID"), os.Getenv("GOOGLE_SECRET_KEY"), "http://localhost:8080/auth/callback/google"),
 	)
-	// r := newRoom(UseAuthAvatar)
-	// r := newRoom(UseGravatarAvatar)
-	r := newRoom(UseFileSystemAvatar)
+	r := newRoom()
 	r.tracer = trace.New(os.Stdout)
 	http.Handle("/login", &templateHandler{filename: "login.html"})
 	http.HandleFunc("/auth/", loginHandler)

@@ -11,14 +11,15 @@ import (
 
 const otherWord = "*"
 
+// あえてスペースを入れている。domainifyで除外するため
 var transforms = []string{
 	otherWord,
-	otherWord + "app",
-	otherWord + "site",
-	otherWord + "time",
-	"get" + otherWord,
-	"go" + otherWord,
-	"lets" + otherWord,
+	otherWord + " app",
+	otherWord + " site",
+	otherWord + " time",
+	"get " + otherWord,
+	"go " + otherWord,
+	"lets " + otherWord,
 }
 
 func main() {

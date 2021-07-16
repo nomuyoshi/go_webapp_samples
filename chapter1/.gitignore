@@ -1,5 +1,4 @@
 chat/chat
-.envrc
 chat/avatars/*
 !chat/avatars/.keep
 .DS_Store

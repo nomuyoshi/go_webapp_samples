@@ -1,4 +1,4 @@
-module webapp_samples
+module chapter1
 
 go 1.16
 

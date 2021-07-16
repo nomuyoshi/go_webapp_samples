@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"webapp_samples/trace"
+	"chapter1/trace"
 
 	"github.com/stretchr/gomniauth"
 	"github.com/stretchr/gomniauth/providers/google"

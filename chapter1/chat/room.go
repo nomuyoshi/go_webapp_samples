@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"webapp_samples/trace"
+	"chapter1/trace"
 
 	"github.com/gorilla/websocket"
 	"github.com/stretchr/objx"

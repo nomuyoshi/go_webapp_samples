@@ -2,10 +2,10 @@ package main
 
 import (
 	"bufio"
+	"chapter4/thesaurus"
 	"fmt"
 	"log"
 	"os"
-	"webapp_samples/chapter4/thesaurus"
 )
 
 func main() {

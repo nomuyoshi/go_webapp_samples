@@ -19,7 +19,7 @@ func main() {
 		word := []byte(s.Text())
 		if !randBool() {
 			fmt.Println(string(word))
-			return
+			continue
 		}
 		var vI int = -1
 		for i, char := range word {
